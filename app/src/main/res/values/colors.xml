@@ -3,4 +3,9 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
-</resources>
+    <color name="gainsbo">#DCDCDC</color>
+    <color name="darkgrey">#808080</color>
+    <color name="gray">#A9A9A9</color>
+    <color name="red">#ff0000</color>
+    <color name="lightred">#ff6666</color>
+></resources>

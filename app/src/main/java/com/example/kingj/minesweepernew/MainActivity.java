@@ -1,5 +1,7 @@
 package com.example.kingj.minesweepernew;
 
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Layout;
@@ -20,7 +22,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     LinearLayout layout;
     MineButton button;
     int size, x = 0;
-    int r, c,count=0;
+    int r, c,min,countReveal=0;
+    public boolean firstclick=false;
     int ia[] = {-1, -1, -1, 0, 0, 1, 1, 1};
     int ja[] = {-1, 0, 1, 1, -1, -1, 0, 1};
     Random rn = new Random();
@@ -34,10 +37,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         layout = findViewById(R.id.root);
-        size = 6;
+        countReveal=0;
+        size = 10;
+        min=30;
         setupBoard();
-
-        show();
+        setMines();
+        //show();
 
 
     }
@@ -54,19 +59,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int id = item.getItemId();
 
         if (id == R.id.easy) {
-            size = 6;
+            min=30;
+            firstclick=false;
             setupBoard();
             setMines();
 
         } else if (id == R.id.medium) {
-            size = 12;
+//            size = 8;
+            min=40;
+            firstclick=false;
             setupBoard();
-            msetMines();
-
+            setMines();
         } else if (id == R.id.hard) {
-            size = 15;
+//            size = 10;
+            min=50;
+            firstclick=false;
             setupBoard();
-            hsetMines();
+            setMines();
         }
 
         return super.onOptionsItemSelected(item);
@@ -76,11 +85,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         board = new MineButton[size][size];
         rows = new ArrayList<>();
         layout.removeAllViews();
+       // layout.setBackgroundColor(Color.BLUE);
 
         for (int i = 0; i < size; i++) {
             LinearLayout linearLayout = new LinearLayout(this);
             linearLayout.setOrientation(LinearLayout.HORIZONTAL);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1);
+//            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1);
             LinearLayout.LayoutParams layoutParams =
                     new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1);
             linearLayout.setLayoutParams(layoutParams);
@@ -98,6 +108,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 button.setOnLongClickListener(this);
                 LinearLayout row = rows.get(i);
                 row.addView(button);
+//                button.setBackgroundResource(R.drawable.newbutton);
+                button.setTextSize(20);
+                //button.setBottom(10);
                 button.isreveal = false;
                 button.setMine(false);
                 button.setValue(0);
@@ -114,49 +127,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         Log.i("MainActivity", "level = " + size + " j = ");
         x=0;
-        while (x < 10) {
+        while (x < min) {
             r = rn.nextInt(size);
             c = rn.nextInt(size);
             MineButton button = board[r][c];
 
-            if (!button.isMine()) {
-                button.setMine(true);
-                button.setValue(-1);
-                Log.i("MainActivity", "Mine set on i = " + r + " j = " + c);
-                x++;
-                countMine(r, c);
-            }
-        }
-    }
-    public void msetMines() {
-
-        Log.i("MainActivity", "level = " + size + " j = ");
-        x=0;
-        while (x < 20) {
-            r = rn.nextInt(size);
-            c = rn.nextInt(size);
-            MineButton button = board[r][c];
-
-            if (!button.isMine()) {
-                button.setMine(true);
-                button.setValue(-1);
-                Log.i("MainActivity", "Mine set on i = " + r + " j = " + c);
-                x++;
-                countMine(r, c);
-            }
-        }
-    }
-
-    public void hsetMines() {
-
-        Log.i("MainActivity", "level = " + size + " j = ");
-        x=0;
-        while (x < 25) {
-            r = rn.nextInt(size);
-            c = rn.nextInt(size);
-            MineButton button = board[r][c];
-
-            if (!button.isMine()) {
+            if (!button.isMine()&&!button.isIsreveal()) {
                 button.setMine(true);
                 button.setValue(-1);
                 Log.i("MainActivity", "Mine set on i = " + r + " j = " + c);
@@ -171,7 +147,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         for (int i = 0; i < 8; i++) {
             newI = x + ia[i];
             newJ = y + ja[i];
-            if (newI >= 0 && newI < size && newJ >= 0 && newJ < size && !board[newI][newJ].isMine()) {
+            if (newI >= 0 && newI < size && newJ >= 0 && newJ < size && !board[newI][newJ].isMine())
+            {
                 board[newI][newJ].setValue(board[newI][newJ].getValue() + 1);
                 Log.i("MainActivity", " ijj value = " + newI + "" + newJ);
                 Log.i("MainActivity", " i value = " + board[newI][newJ].getValue());
@@ -208,13 +185,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 {
                     Log.i("MainActivity", " newi value = " + newI + "" + newJ);
 
-                    if ((!board[newI][newJ].isIsreveal()) && (!gt.equals("F")))
+                    if ((!board[newI][newJ].isIsreveal()) && board[newI][newJ].flag==false)
                     {
                         int nv = board[newI][newJ].getValue();
 
                         if (nv == 0)
                         {
-
+//                            board[newI][newJ].setBackgroundColor(Color.DKGRAY);
+                            board[newI][newJ].setBackgroundResource(R.drawable.button_bg);
                             board[newI][newJ].setIsreveal(true);
                             board[newI][newJ].setEnabled(false);
                             reveal(board[newI][newJ]);
@@ -223,6 +201,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         {
                             board[newI][newJ].setIsreveal(true);
                             board[newI][newJ].setEnabled(false);
+                            textColor(nv,board[newI][newJ]);
                             board[newI][newJ].setText(nv + "");
                         }
                     }
@@ -238,7 +217,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                         if(mv==-1)
                         {
-                            board[i][j].setText(mv+"");
+                            board[i][j].setBackgroundResource(R.drawable.mine);
+
+//                            board[i][j].setText(mv+"");
                         }
                         board[i][j].setEnabled(false);
                     }
@@ -248,7 +229,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             else if(value>0)
             {   b1.setIsreveal(true);
                 b1.setEnabled(false);
+                textColor(value,b1);
+
                 b1.setText(value + "");
+            }
+
+        }
+
+        public void textColor(int value,MineButton b1)
+        {
+            if(value==1)
+            {
+                b1.setTextColor(Color.BLUE);
+            }
+            else if(value==2)
+            {
+                b1.setTextColor(Color.GREEN);
+            }
+            else if(value==3)
+            {
+                b1.setTextColor(Color.RED);
+            }
+            else if(value==4)
+            {
+                b1.setTextColor(Color.MAGENTA);
+            }
+            else if(value==5)
+            {
+                b1.setTextColor(Color.DKGRAY);
+            }
+            else if(value==2)
+            {
+                b1.setTextColor(Color.BLACK);
             }
 
         }
@@ -256,18 +268,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         public void onClick (View view){
 
-            if(count==0)
-            {
-                setMines();
-                show();
-            }
+
             MineButton bt = (MineButton) view;
             String gt = bt.getText().toString();
+            int vl = bt.getValue();
 
-            if(!gt.equals("F")) {
+            if(firstclick==false && vl==-1)
+            {
+                bt.setText(" ");
+                x=x-1;
+                firstclick=true;
+                bt.setIsreveal(true);
+                bt.setBackgroundResource(R.drawable.button_bg);
+                reveal(bt);
+                setMines();
+                //show();
+
+
+            }
+            else if(firstclick==false)
+            {
+                firstclick=true;
+                bt.setIsreveal(true);
+                bt.setBackgroundResource(R.drawable.button_bg);
                 reveal(bt);
             }
-            count++;
+            else if (!gt.equals("F")) {
+
+                bt.setBackgroundResource(R.drawable.button_bg);
+                reveal(bt);
+            }
         }
 
     @Override
@@ -276,14 +306,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if(bt.isFlag())
         {
-            bt.setText("");
-            bt.flag=false;
+            bt.setBackgroundResource(android.R.drawable.btn_default_small);
         }
         else
         {
-            bt.setText("F");
+            bt.setBackgroundResource(R.drawable.flag);
             bt.flag=true;
-
         }
                 return true;
     }
