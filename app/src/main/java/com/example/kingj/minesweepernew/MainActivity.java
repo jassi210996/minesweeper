@@ -276,12 +276,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if(firstclick==false && vl==-1)
             {
                 bt.setText(" ");
+                bt.setValue(0);
                 x=x-1;
                 firstclick=true;
                 bt.setIsreveal(true);
                 bt.setBackgroundResource(R.drawable.button_bg);
-                reveal(bt);
+
                 setMines();
+                reveal(bt);
                 //show();
 
 
