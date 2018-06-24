@@ -378,6 +378,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(bt.isFlag())
         {
             bt.setBackgroundResource(android.R.drawable.btn_default_small);
+            bt.flag=false;
         }
         else
         {
