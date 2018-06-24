@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:title="Difficuty" android:id="@+id/diff">
         <menu xmlns:android="http://schemas.android.com/apk/res/android">
             <item android:title="Easy" android:id="@+id/easy"></item>
             <item android:title="Medium" android:id="@+id/medium"></item>
             <item android:title="Hard" android:id="@+id/hard"></item>
-        </menu>
+            </menu>
     </item>
+    <item android:title="Reset" android:icon="@drawable/reset" app:showAsAction="always" android:id="@+id/reset"></item>
+
 </menu>

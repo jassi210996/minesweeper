@@ -83,6 +83,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             setupBoard();
             setMines();
         }
+        else if(id==R.id.reset)
+        {
+            resetBoard();
+            min=30;
+            firstclick=false;
+            countRevealed=0;
+            buttonsToberevealed=((size*size)+1)-min;
+            setupBoard();
+            setMines();
+        }
 
         return super.onOptionsItemSelected(item);
     }
