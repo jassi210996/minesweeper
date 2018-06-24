@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     LinearLayout layout;
     MineButton button;
     int size, x = 0;
-    int r, c,min,countReveal=0;
+    int r, c,min,countRevealed,buttonsToberevealed;
     public boolean firstclick=false;
     int ia[] = {-1, -1, -1, 0, 0, 1, 1, 1};
     int ja[] = {-1, 0, 1, 1, -1, -1, 0, 1};
@@ -37,14 +37,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         layout = findViewById(R.id.root);
-        countReveal=0;
+        countRevealed=0;
         size = 10;
         min=30;
+        buttonsToberevealed=((size*size)+1)-min;
         setupBoard();
         setMines();
-        //show();
-
-
+      //  show();
     }
 
     @Override
@@ -61,19 +60,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (id == R.id.easy) {
             min=30;
             firstclick=false;
+            countRevealed=0;
+            buttonsToberevealed=((size*size)+1)-min;
             setupBoard();
             setMines();
+//            show();
 
         } else if (id == R.id.medium) {
 //            size = 8;
             min=40;
             firstclick=false;
+            countRevealed=0;
+            buttonsToberevealed=((size*size)+1)-min;
             setupBoard();
             setMines();
         } else if (id == R.id.hard) {
 //            size = 10;
-            min=50;
+            min=55;
             firstclick=false;
+            countRevealed=0;
+            buttonsToberevealed=((size*size)+1)-min;
             setupBoard();
             setMines();
         }
@@ -108,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 button.setOnLongClickListener(this);
                 LinearLayout row = rows.get(i);
                 row.addView(button);
-//                button.setBackgroundResource(R.drawable.newbutton);
+//              button.setBackgroundResource(R.drawable.newbutton);
                 button.setTextSize(20);
                 //button.setBottom(10);
                 button.isreveal = false;
@@ -169,100 +175,154 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void reveal(MineButton b1) {
         String gt = b1.getText().toString();
         int value = b1.getValue();
+        countRevealed++;
 
-        if (value == 0) {
+        if (gameStatus(countRevealed)) {
 
-            b1.setIsreveal(true);
-            b1.setEnabled(false);
-            int newI, newJ;
+            if (value == 0) {
 
-            for (int i = 0; i < 8; i++)
-            {
-                newI = b1.bi + ia[i];
-                newJ = b1.bj + ja[i];
+                b1.setIsreveal(true);
+                b1.setEnabled(false);
+                int newI, newJ;
 
-                if (newI >= 0 && newI < size && newJ >= 0 && newJ < size )
-                {
-                    Log.i("MainActivity", " newi value = " + newI + "" + newJ);
+                for (int i = 0; i < 8; i++) {
+                    newI = b1.bi + ia[i];
+                    newJ = b1.bj + ja[i];
 
-                    if ((!board[newI][newJ].isIsreveal()) && board[newI][newJ].flag==false)
+                    if (newI >= 0 && newI < size && newJ >= 0 && newJ < size)
                     {
-                        int nv = board[newI][newJ].getValue();
+                        Log.i("MainActivity", " newi value = " + newI + "" + newJ);
 
-                        if (nv == 0)
+                        if ((!board[newI][newJ].isIsreveal()) && board[newI][newJ].flag == false)
                         {
+                            int nv = board[newI][newJ].getValue();
+                                countRevealed++;
+                           if(gameStatus(countRevealed)) {
+                               if (nv == 0) {
 //                            board[newI][newJ].setBackgroundColor(Color.DKGRAY);
-                            board[newI][newJ].setBackgroundResource(R.drawable.button_bg);
-                            board[newI][newJ].setIsreveal(true);
-                            board[newI][newJ].setEnabled(false);
-                            reveal(board[newI][newJ]);
-                        }
-                        else if (nv > 0)
-                        {
-                            board[newI][newJ].setIsreveal(true);
-                            board[newI][newJ].setEnabled(false);
-                            textColor(nv,board[newI][newJ]);
-                            board[newI][newJ].setText(nv + "");
+                                   board[newI][newJ].setBackgroundResource(R.drawable.button_bg);
+                                   board[newI][newJ].setIsreveal(true);
+                                   board[newI][newJ].setEnabled(false);
+                                   reveal(board[newI][newJ]);
+                               } else if (nv > 0) {
+                                   board[newI][newJ].setIsreveal(true);
+                                   board[newI][newJ].setEnabled(false);
+                                   textColor(nv, board[newI][newJ]);
+                                   board[newI][newJ].setText(nv + "");
+                               }
+                           }
                         }
                     }
                 }
             }
-        }
-            if (value == -1 ) {
-                b1.setText(value+"");
-                for(int i=0;i<size;i++)
-                {
-                    for(int j=0;j<size;j++)
-                    {   int mv = board[i][j].getValue();
+            if (value == -1) {
+                b1.setText(value + "");
+                for (int i = 0; i < size; i++) {
+                    for (int j = 0; j < size; j++) {
+                        int mv = board[i][j].getValue();
 
-                        if(mv==-1)
-                        {
+                        if (mv == -1) {
                             board[i][j].setBackgroundResource(R.drawable.mine);
 
 //                            board[i][j].setText(mv+"");
-                        }
+                        } else if (mv > 0) {
+
+                            textColor(mv, board[i][j]);
+                        } else
+                            board[i][j].setBackgroundResource(R.drawable.button_bg);
+
                         board[i][j].setEnabled(false);
                     }
                 }
                 Toast.makeText(this, "Game over", Toast.LENGTH_LONG).show();
-            }
-            else if(value>0)
-            {   b1.setIsreveal(true);
+            } else if (value > 0) {
+                b1.setIsreveal(true);
                 b1.setEnabled(false);
-                textColor(value,b1);
+                textColor(value, b1);
 
                 b1.setText(value + "");
             }
 
         }
+        else
+        {
+            for (int i = 0; i < size; i++) {
+                for (int j = 0; j < size; j++) {
+                    int mv = board[i][j].getValue();
+
+                    if (mv == -1) {
+                        board[i][j].setBackgroundResource(R.drawable.mine);
+
+//                            board[i][j].setText(mv+"");
+                    }
+                    board[i][j].setEnabled(false);
+                }
+            }
+            Toast.makeText(this, "Game Won", Toast.LENGTH_LONG).show();
+        }
+    }
 
         public void textColor(int value,MineButton b1)
         {
+            b1.setText(value+"");
             if(value==1)
             {
+
+                b1.setBackgroundResource(R.drawable.button_bg);
                 b1.setTextColor(Color.BLUE);
             }
             else if(value==2)
-            {
+            { b1.setBackgroundResource(R.drawable.button_bg);
                 b1.setTextColor(Color.GREEN);
             }
             else if(value==3)
-            {
+            { b1.setBackgroundResource(R.drawable.button_bg);
                 b1.setTextColor(Color.RED);
             }
             else if(value==4)
-            {
+            { b1.setBackgroundResource(R.drawable.button_bg);
                 b1.setTextColor(Color.MAGENTA);
             }
             else if(value==5)
-            {
+            { b1.setBackgroundResource(R.drawable.button_bg);
                 b1.setTextColor(Color.DKGRAY);
             }
-            else if(value==2)
-            {
+            else if(value==6)
+            { b1.setBackgroundResource(R.drawable.button_bg);
                 b1.setTextColor(Color.BLACK);
             }
+            else if(value==7)
+            { b1.setBackgroundResource(R.drawable.button_bg);
+                b1.setTextColor(Color.BLUE);
+            }
+            else if(value==8)
+            { b1.setBackgroundResource(R.drawable.button_bg);
+                b1.setTextColor(Color.RED);
+            }
 
+        }
+
+        public void resetBoard(){
+        for(int i=0;i<size;i++)
+        {
+            for(int j=0;j<size;j++)
+            {
+                MineButton button=board[i][j];
+                button.isreveal=false;
+                button.setValue(0);
+                button.setMine(false);
+            }
+        }
+        }
+
+        public boolean gameStatus(int countRevealed)
+        {
+            if(countRevealed==buttonsToberevealed)
+            {
+                return false;
+            }
+            else
+                return true;
         }
 
         @Override
@@ -275,23 +335,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             if(firstclick==false && vl==-1)
             {
-                bt.setText(" ");
-                bt.setValue(0);
-                x=x-1;
+               // bt.setText(" ");
+                //bt.setValue(0);
+                //x=x-1;
+                resetBoard();
                 firstclick=true;
                 bt.setIsreveal(true);
                 bt.setBackgroundResource(R.drawable.button_bg);
-
                 setMines();
                 reveal(bt);
                 //show();
-
-
             }
             else if(firstclick==false)
             {
                 firstclick=true;
                 bt.setIsreveal(true);
+             //   countRevealed++;
                 bt.setBackgroundResource(R.drawable.button_bg);
                 reveal(bt);
             }
